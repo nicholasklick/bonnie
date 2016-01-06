@@ -91,10 +91,10 @@ namespace :bonnie do
         if error
           in_error += 1
           value_sets = measure.value_sets
-          if (value_sets.length != measure.oid_to_version.length)
-            puts "\n\nversion_oid: #{measure.oid_to_version.length} ||| set length #{value_sets.length}"
+          if (value_sets.length != measure.bonnie_hashes.length)
+            puts "\n\nversion_oid: #{measure.bonnie_hashes.length} ||| set length #{value_sets.length}"
             puts "#{measure.value_set_oids}"
-            puts "#{measure.oid_to_version}"
+            puts "#{measure.bonnie_hashes}"
           end
           puts "\n\n  Error with user #{measure.user.email} measure #{measure.cms_id} patient '#{patient.first} #{patient.last}':"
           puts "  #{error}\n\n"

@@ -54,9 +54,9 @@ namespace :bonnie do
           puts "#{progress} / #{size}"
         end
 
-        m.oid_to_version = []
+        m.bonnie_hashes = []
         m.value_set_oids.each do |oid|
-          m.oid_to_version.push(user_oid_to_version[[oid, m.user_id]])
+          m.bonnie_hashes.push(user_oid_to_version[[oid, m.user_id]])
         end
         m.save!
       end
@@ -91,7 +91,7 @@ namespace :bonnie do
       end
 
       Measure.each do |m|
-        puts m.oid_to_version
+        puts m.bonnie_hashes
       end
     end
   end
