@@ -6,7 +6,7 @@ include Devise::TestHelpers
   setup do
     @error_dir = File.join('log','load_errors')
     FileUtils.rm_r @error_dir if File.directory?(@error_dir)
-    dump_database
+    dump_database()
     collection_fixtures("draft_measures", "users")
     @user = User.by_email('bonnie@example.com').first
     associate_user_with_measures(@user,Measure.all)
@@ -81,6 +81,7 @@ include Devise::TestHelpers
     assert_equal true, measure.needs_finalize
     assert_equal true, measure.episode_of_care?
     assert_equal 'eh', measure.type
+    assert_equal @user.id, measure.user_id
     assert_nil measure.population_criteria['DENOM']['preconditions']
     assert_nil measure.episode_ids
     assert_operator measure.map_fns[0].length, :>, 100

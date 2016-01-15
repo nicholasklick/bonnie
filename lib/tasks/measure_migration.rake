@@ -1,13 +1,13 @@
 namespace :bonnie do
   namespace :measures do
 
-	  desc "Delete Value Set indexes that are not needed in Bonnie"
-	  task :delete_unnecessary_value_set_indexes => :environment do
-	    HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.code"=>1})
-	    HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.code_system"=>1})
-	    HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.code_system_name"=>1})
-	    HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.display_name"=>1})
-	  end
+    desc "Delete Value Set indexes that are not needed in Bonnie"
+    task :delete_unnecessary_value_set_indexes => :environment do
+      HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.code"=>1})
+      HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.code_system"=>1})
+      HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.code_system_name"=>1})
+      HealthDataStandards::SVS::ValueSet.collection.indexes.drop({"concepts.display_name"=>1})
+    end
 
     desc "Migrates measures and value_sets away from User versioning"
     task :consolidate_value_sets => :environment do
@@ -28,10 +28,10 @@ namespace :bonnie do
           puts "\n#{progress} / #{size}"
         end
 
-        vs.bonnie_hash = HealthDataStandards::SVS::ValueSet.gen_bonnie_hash(vs)
-        user_oid_to_version[[vs.oid, vs.user_id]] = vs.bonnie_hash
+        vs.bonnie_version_hash = HealthDataStandards::SVS::ValueSet.generate_bonnie_hash(vs)
+        user_oid_to_version[[vs.oid, vs.user_id]] = vs.bonnie_version_hash
 
-        if (seen_hashes.add?(vs.bonnie_hash).nil?)
+        if (seen_hashes.add?(vs.bonnie_version_hash).nil?)
           to_delete.push(vs)
           print "!"
         else
@@ -87,7 +87,7 @@ namespace :bonnie do
 
     task :check_sets => :environment do
       HealthDataStandards::SVS::ValueSet.each do |vs|
-        puts vs.bonnie_hash
+        puts vs.bonnie_version_hash
       end
 
       Measure.each do |m|

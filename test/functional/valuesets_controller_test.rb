@@ -10,14 +10,16 @@ class ValuesetsControllerTest  < ActionController::TestCase
 
     associate_user_with_measures(@user,Measure.all)
 
-    @user.measures.first.value_set_oids.uniq.each_with_index do |oid|
-      vs = HealthDataStandards::SVS::ValueSet.new(oid: oid)
-      vs.version = oid
-      (0..10).each do |index|
-        vs.concepts << HealthDataStandards::SVS::Concept.new(code_set: 'foo', code:"bar_#{index}")
+    @user.measures.each do |measure|
+      measure.value_set_oids.uniq.each_with_index do |oid|
+        vs = HealthDataStandards::SVS::ValueSet.new(oid: oid)
+        vs.version = "TEST"
+        (0..10).each do |index|
+          vs.concepts << HealthDataStandards::SVS::Concept.new(code_set: 'foo', code:"bar_#{index}")
+        end
+        vs.save!
+        measure.bonnie_hashes.push(vs.bonnie_version_hash)
       end
-      vs.bonnie_hash = HealthDataStandards::SVS::ValueSet.gen_bonnie_hash(vs)
-      vs.save!
     end
     sign_in @user
   end
@@ -33,7 +35,7 @@ class ValuesetsControllerTest  < ActionController::TestCase
       assert !concept.black_list
     end
 
-    vs_to_change = HealthDataStandards::SVS::ValueSet.where({bonnie_hash: "43d8bf2b249f72604ab87ee422274eef"}).first
+    vs_to_change = HealthDataStandards::SVS::ValueSet.where({bonnie_version_hash: "2f96447ca313cd6b9f3ceb15ac9ff14a"}).first
 
     (vs_to_change.concepts.select {|c| c.code == 'bar_4'}).first.white_list = true
     (vs_to_change.concepts.select {|c| c.code == 'bar_8'}).first.black_list = true
@@ -42,7 +44,7 @@ class ValuesetsControllerTest  < ActionController::TestCase
     post :update, {id: vs_to_change.id, concepts: vs_to_change.concepts.map {|c| c.attributes}}
     assert_response :success
 
-    vs_to_change = HealthDataStandards::SVS::ValueSet.where({bonnie_hash: "43d8bf2b249f72604ab87ee422274eef"}).first
+    vs_to_change = HealthDataStandards::SVS::ValueSet.where({bonnie_version_hash: "2f96447ca313cd6b9f3ceb15ac9ff14a"}).first
     vs.concepts.each do |concept|
       unless ['bar_4','bar_8','bar_9'].include?(concept.code)
         assert !concept.white_list
