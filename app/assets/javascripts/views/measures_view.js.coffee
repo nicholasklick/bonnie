@@ -5,6 +5,7 @@ class Thorax.Views.Measures extends Thorax.Views.BonnieView
   initialize: ->
     toFinalize = @collection.select (m) -> m.get('needs_finalize')
     @finalizeMeasuresView = new Thorax.Views.FinalizeMeasures measures: new Thorax.Collections.Measures(toFinalize)
+    @cqlView = new Thorax.Views.CqlTestView(collection: bonnie.patients)
 
   importMeasure: (event) ->
     importMeasureView = new Thorax.Views.ImportMeasure(firstMeasure: (@collection.length == 0))

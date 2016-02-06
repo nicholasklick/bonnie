@@ -1,0 +1,18 @@
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Name</th>
+      {{#each headers}}
+        <th>{{this}}</th>
+      {{/each}}
+    </tr>
+  </thead>
+{{#collection tag="tbody" item-context=patientContext}}
+  <tr>
+    <td>{{first}} {{last}}</td>
+    {{#each values}}
+      <td>{{this}}</td>
+    {{/each}}
+  </tr>
+{{/collection}}
+</table>
