@@ -5515,14 +5515,11 @@
     };
 
     MultiSource.prototype.forEach = function(ctx, func) {
-      var i, len, rctx, rec, ref2, results;
-      if (this.records == null) {
-        this.records = this.expression.exec(ctx);
-      }
-      ref2 = this.records;
+      var i, len, rctx, rec, records, results;
+      records = this.expression.exec(ctx) || [];
       results = [];
-      for (i = 0, len = ref2.length; i < len; i++) {
-        rec = ref2[i];
+      for (i = 0, len = records.length; i < len; i++) {
+        rec = records[i];
         rctx = new Context(ctx);
         rctx.set(this.alias, rec);
         if (this.rest) {

@@ -357,9 +357,9 @@ class WrappedEntry
     allCodes
   get: (attribute) ->
     switch attribute
-      when 'start datetime' 
+      when 'start datetime'
         cql.DateTime.fromDate(moment.utc(@entry.start_time, 'X').toDate())
-      when 'stop datetime' 
+      when 'stop datetime'
         cql.DateTime.fromDate(moment.utc(@entry.end_time, 'X').toDate())
       else
         console.log "Requesting unknown attribute #{attribute} from entry"
