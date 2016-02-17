@@ -18,7 +18,8 @@
     "jquery-color": "~2.1.2",
     "css-toggle-switch": "~2.1.5",
     "bootstrap-file-input": "*",
-    "MutationObserver-shim": "~0.2.8"
+    "MutationObserver-shim": "~0.2.8",
+    "handsontable": "~0.20.3"
   },
   "resolutions": {
     "bootstrap": "~3.3.0"
