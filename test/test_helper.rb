@@ -4,6 +4,7 @@ require_relative "./simplecov"
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require './lib/ext/record'
+WebMock.enable!
 
 class ActiveSupport::TestCase
  
