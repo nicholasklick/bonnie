@@ -1,3 +1,11 @@
+<form>
+  <div class="form-group">
+    <label for="emailBody">CQL</label>
+    <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
+  </div>
+  <input type="submit" value="Evaluate" class="btn btn-default">
+</form>
+
 <table class='table'>
   <thead>
     <tr>
@@ -7,7 +15,7 @@
       {{/each}}
     </tr>
   </thead>
-{{#collection tag="tbody" item-context=patientContext}}
+{{#collection resultCollection tag="tbody" item-context=patientContext}}
   <tr>
     <td>{{first}} {{last}}</td>
     {{#each values}}
