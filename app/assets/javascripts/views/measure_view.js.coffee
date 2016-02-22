@@ -12,8 +12,6 @@ class Thorax.Views.Measure extends Thorax.Views.BonnieView
     population = @model.get 'displayedPopulation'
     populationLogicView = new Thorax.Views.PopulationLogic(model: population)
     @measureViz = Bonnie.viz.measureVisualzation().fontSize("1.25em").rowHeight(20).rowPadding({top: 14, right: 6}).dataCriteria(@model.get("data_criteria")).measurePopulation(population).measureValueSets(@model.valueSets())
-    @cqlView = new Thorax.Views.CqlTestView(collection: @model.get('patients'))
-
 
     # display layout view when there are multiple populations; otherwise, just show logic view
     if populations.length > 1
@@ -50,6 +48,10 @@ class Thorax.Views.Measure extends Thorax.Views.BonnieView
     importMeasureView = new Thorax.Views.ImportMeasure(model: @model)
     importMeasureView.appendTo(@$el)
     importMeasureView.display()
+
+  showCQL: (e) ->
+    cqlView = new Thorax.Views.CqlTestView(collection: @model.get('patients'))
+    cqlView.appendTo(@$el)
 
   exportQrdaPatients: (e) ->
     @exportPatientsView.exporting()

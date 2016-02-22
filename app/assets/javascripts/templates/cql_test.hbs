@@ -1,26 +1,20 @@
-<form>
-  <div class="form-group">
-    <label for="emailBody">CQL</label>
-    <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
+<div class="modal fade" id="cqlTestDialog" tabindex="-1" aria-hidden="true">
+  <div class="cql-modal modal-dialog" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        {{#button "close" class="close" data-dismiss="modal" aria-hidden="true"}}&times;{{/button}}
+        <h1 class="modal-title" id="modalTitle">CQL Evaluation (Alpha)</h1>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="emailBody">CQL</label>
+            <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
+          </div>
+          <input type="submit" value="Evaluate" class="btn btn-default">
+        </form>
+        {{view resultsView}}
+      </div>
+    </div>
   </div>
-  <input type="submit" value="Evaluate" class="btn btn-default">
-</form>
-
-<table class='table'>
-  <thead>
-    <tr>
-      <th>Name</th>
-      {{#each headers}}
-        <th>{{this}}</th>
-      {{/each}}
-    </tr>
-  </thead>
-{{#collection resultCollection tag="tbody" item-context=patientContext}}
-  <tr>
-    <td>{{first}} {{last}}</td>
-    {{#each values}}
-      <td>{{this}}</td>
-    {{/each}}
-  </tr>
-{{/collection}}
-</table>
+</div>
