@@ -117,25 +117,29 @@ class Thorax.Views.CqlTestView extends Thorax.Views.BonnieView
 
   snippets: ->
     [
-      """library TinyQDM version '4'"""
-      """using QDM"""
+      "library TinyQDM version '4'"
+      "using QDM"
       """valueset "Ischemic Stroke": '2.16.840.1.113883.3.117.1.7.1.247'"""
-      """parameter MeasurementPeriod default Interval[DateTime(2012, 1, 1, 0, 0, 0, 0), DateTime(2013, 1, 1, 0, 0, 0, 0))"""
-      """context Patient"""
-      """define PatientAge: AgeInYearsAt(start of MeasurementPeriod)"""
-      """define PatientOver18: AgeInYearsAt(start of MeasurementPeriod) > 18"""
+      "parameter MeasurementPeriod default Interval[DateTime(2012, 1, 1, 0, 0, 0, 0), DateTime(2013, 1, 1, 0, 0, 0, 0))"
+      "context Patient"
+      ""
+      "define PatientAge: AgeInYearsAt(start of MeasurementPeriod)"
+      ""
+      "define PatientOver18: AgeInYearsAt(start of MeasurementPeriod) > 18"
+      ""
       """define IschemicStroke: ["Diagnosis, Active": "Ischemic Stroke"]"""
+      ""
       """define IschemicStrokeMP: IschemicStroke IS where IS."start datetime" during MeasurementPeriod"""
     ]
 
   addSnippet1: ->
-    @$('textarea').val(@snippets().slice(0, 6).join("\n"))
-
-  addSnippet2: ->
     @$('textarea').val(@snippets().slice(0, 7).join("\n"))
 
+  addSnippet2: ->
+    @$('textarea').val(@snippets().slice(0, 9).join("\n"))
+
   addSnippet3: ->
-    @$('textarea').val(@snippets().slice(0, 8).join("\n"))
+    @$('textarea').val(@snippets().slice(0, 11).join("\n"))
 
   addSnippet4: ->
-    @$('textarea').val(@snippets().slice(0, 9).join("\n"))
+    @$('textarea').val(@snippets().slice(0, 13).join("\n"))
