@@ -6,14 +6,20 @@
         <h1 class="modal-title" id="modalTitle">CQL Evaluation (Alpha)</h1>
       </div>
       <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="emailBody">CQL</label>
-            <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
+        <div class="row">
+          <div class="col-md-6">
+            <form>
+              <div class="form-group">
+                <label for="emailBody">CQL</label>
+                <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
+              </div>
+              <input type="submit" value="Evaluate" class="btn btn-default">
+            </form>
           </div>
-          <input type="submit" value="Evaluate" class="btn btn-default">
-        </form>
-        {{view resultsView}}
+          <div class="col-md-6">
+            {{view resultsView}}
+          </div>
+        </div>
       </div>
     </div>
   </div>

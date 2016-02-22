@@ -43,17 +43,19 @@ class Thorax.Views.CqlResultsView extends Thorax.Views.BonnieView
   template: JST['cql_results']
 
   initialize: ->
-    # Perform a full re-render on collection update to capture header changes
+    # Perform a full re-render on collection update since we don't use collection template helpers
     @collection.on 'add remove change', => @render()
 
   context: ->
-    # Assume all patients have same fields, so we can just extract headers from the first one
-    if patient = @collection.first() then results = patient.get('results') else {}
-    _(super).extend headers: _(results).chain().omit('Patient').keys().value()
+    # We use the list of patients for the header
+    patients = @collection.map (p) -> "#{p.get('last')}, #{p.get('first')}"
+    # Assume all patients have same fields, so we can extract statement names from the results in the first
+    results = if patient = @collection.first() then patient.get('results') else {}
+    # For the body, each row represents a statement and the results for that statement for each patient
+    statements = _(results).chain().omit('Patient').keys().value()
+    rows = _(statements).map (s) => { statement: s, results: @collection.map (p) -> p.get('results')[s] }
+    _(super).extend patients: patients, rows: rows
 
-  patientContext: (p) ->
-    # Extract just the values from the results; omit the Patient field, since it's not a statement result
-    return _(p.toJSON()).extend values: _(p.get('results')).chain().omit('Patient').values().value()
 
 class Thorax.Views.CqlTestView extends Thorax.Views.BonnieView
 
