@@ -8,9 +8,14 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-md-6">
+            <label for="cqlButtons">
+              {{#button "addSnippet1" class="btn btn-xs"}}Snippet 1{{/button}}
+              {{#button "addSnippet2" class="btn btn-xs"}}Snippet 2{{/button}}
+              {{#button "addSnippet3" class="btn btn-xs"}}Snippet 3{{/button}}
+              {{#button "addSnippet4" class="btn btn-xs"}}Snippet 4{{/button}}
+            </label>
             <form>
               <div class="form-group">
-                <label for="emailBody">CQL</label>
                 <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
               </div>
               <input type="submit" value="Evaluate" class="btn btn-default">
