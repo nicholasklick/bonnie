@@ -12,7 +12,7 @@
       <tr>
         <td><b>{{statement}}</b></td>
         {{#each results}}
-          <td>{{this}}</td>
+          <td>{{view "CQLResultView" result=this}}</td>
         {{/each}}
       </tr>
     {{/each}}

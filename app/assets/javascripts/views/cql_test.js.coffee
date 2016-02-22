@@ -1,5 +1,9 @@
 class WrappedEntry
   constructor: (@entry) ->
+    # Set some field values for display; these aren't used for calculation
+    @description = @entry.description
+    @startTime = moment.utc(@entry.start_time, 'X').format('L LT')
+    @stopTime = moment.utc(@entry.end_time, 'X').format('L LT')
   getCode: ->
     allCodes = []
     for system, codes of @entry.codes
@@ -14,7 +18,6 @@ class WrappedEntry
         cql.DateTime.fromDate(moment.utc(@entry.end_time, 'X').toDate())
       else
         console.log "Requesting unknown attribute #{attribute} from entry"
-  toString: -> "#{@entry.description} (#{moment.utc(@entry.start_time, 'X').format('L LT')})"
 
 class WrappedPatient
   constructor: (@patient) ->
@@ -38,9 +41,25 @@ class PatientSource
   nextPatient: -> @index += 1
 
 
+# View representing a single CQL result; this can be a literal, an element, an array of elements, etc
+class Thorax.Views.CQLResultView extends Thorax.Views.BonnieView
+  template: JST['cql/cql_result']
+  events:
+    rendered: ->
+      popoverContent = @$('.cql-entry-details').html()
+      @$('.cql-entry').popover trigger: 'hover', placement: 'left', title: "Details", html: true, content: popoverContent
+  initialize: ->
+    @type = switch
+      when @result instanceof WrappedEntry then 'entry'
+      when Array.isArray(@result) then 'array'
+      else 'literal'
+  context: ->
+    _(super).extend result: @result
+
+# View representing a table of CQL results
 class Thorax.Views.CqlResultsView extends Thorax.Views.BonnieView
 
-  template: JST['cql_results']
+  template: JST['cql/cql_results']
 
   initialize: ->
     # Perform a full re-render on collection update since we don't use collection template helpers
@@ -59,7 +78,7 @@ class Thorax.Views.CqlResultsView extends Thorax.Views.BonnieView
 
 class Thorax.Views.CqlTestView extends Thorax.Views.BonnieView
 
-  template: JST['cql_test']
+  template: JST['cql/cql_test']
 
   initialize: ->
     @resultCollection = new Thorax.Collection()

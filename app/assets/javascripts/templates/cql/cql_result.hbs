@@ -1,0 +1,21 @@
+{{#ifCond type "==" "literal"}}
+  {{result}}
+{{/ifCond}}
+
+{{#ifCond type "==" "array"}}
+  {{#each result}}
+    {{view "CQLResultView" result=this}}
+  {{/each}}
+{{/ifCond}}
+
+{{#ifCond type "==" "entry"}}
+  <div class="cql-entry well">
+    {{result.description}}
+  </div>
+  <div class="cql-entry-details hidden">
+    <table class="table table-condensed">
+      <tr><td>Start</td><td>{{result.startTime}}</td></tr>
+      <tr><td>Stop</td><td>{{result.stopTime}}</td></tr>
+    </table>
+  </div>
+{{/ifCond}}
