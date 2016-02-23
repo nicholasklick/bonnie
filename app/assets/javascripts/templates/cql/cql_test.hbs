@@ -6,25 +6,19 @@
         <h1 class="modal-title" id="modalTitle">CQL Evaluation (Alpha)</h1>
       </div>
       <div class="modal-body">
-        <div class="row">
-          <div class="col-md-5">
-            <label for="cqlButtons">
-              {{#button "addSnippet1" class="btn btn-xs"}}Snippet 1{{/button}}
-              {{#button "addSnippet2" class="btn btn-xs"}}Snippet 2{{/button}}
-              {{#button "addSnippet3" class="btn btn-xs"}}Snippet 3{{/button}}
-              {{#button "addSnippet4" class="btn btn-xs"}}Snippet 4{{/button}}
-            </label>
-            <form>
-              <div class="form-group">
-                <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
-              </div>
-              <input type="submit" value="Evaluate" class="btn btn-default">
-            </form>
+        <label for="cqlButtons">
+          {{#button "addSnippet1" class="btn btn-xs"}}Snippet 1{{/button}}
+          {{#button "addSnippet2" class="btn btn-xs"}}Snippet 2{{/button}}
+          {{#button "addSnippet3" class="btn btn-xs"}}Snippet 3{{/button}}
+          {{#button "addSnippet4" class="btn btn-xs"}}Snippet 4{{/button}}
+        </label>
+        <form>
+          <div class="form-group">
+            <textarea class="form-control" rows="15" name="cql" id="cql"></textarea>
           </div>
-          <div class="col-md-7">
-            {{view resultsView}}
-          </div>
-        </div>
+          <input type="submit" value="Evaluate" class="btn btn-default">
+        </form>
+        {{view resultsView}}
       </div>
     </div>
   </div>
