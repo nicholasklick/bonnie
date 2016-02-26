@@ -12,10 +12,13 @@ class WrappedEntry
     allCodes
   get: (attribute) ->
     switch attribute
-      when 'start datetime'
-        cql.DateTime.fromDate(moment.utc(@entry.start_time, 'X').toDate())
-      when 'stop datetime'
-        cql.DateTime.fromDate(moment.utc(@entry.end_time, 'X').toDate())
+      when 'start datetime', 'admission datetime', 'onset datetime'
+        return cql.DateTime.fromDate(moment.utc(@entry.start_time, 'X').toDate())
+      when 'stop datetime', 'discharge datetime', 'abatement datetime'
+        return cql.DateTime.fromDate(moment.utc(@entry.end_time, 'X').toDate())
+      when 'discharge status'
+        if @entry.dischargeDisposition
+          return new cql.Code(@entry.dischargeDisposition.code, @entry.dischargeDisposition.code_system)
       else
         console.log "Requesting unknown attribute #{attribute} from entry"
 
@@ -26,7 +29,7 @@ class WrappedPatient
     switch profile
       when 'Patient'
         [{ 'birth datetime': cql.DateTime.fromDate(moment.utc(@patient.get('birthdate'), 'X').toDate()) }]
-      when 'DiagnosisActive'
+      when 'DiagnosisActive', 'Diagnosis'
         _(@patient.get('conditions')).map (c) -> new WrappedEntry(c)
       when 'EncounterPerformed'
         _(@patient.get('encounters')).map (e) -> new WrappedEntry(e)
@@ -52,9 +55,8 @@ class Thorax.Views.CQLResultView extends Thorax.Views.BonnieView
     @type = switch
       when @result instanceof WrappedEntry then 'entry'
       when Array.isArray(@result) then 'array'
+      when typeof @result == 'boolean' then 'boolean'
       else 'literal'
-  context: ->
-    _(super).extend result: @result
 
 # View representing a table of CQL results
 class Thorax.Views.CqlResultsView extends Thorax.Views.BonnieView
@@ -94,7 +96,7 @@ class Thorax.Views.CqlTestView extends Thorax.Views.BonnieView
       cql = @$('textarea').val()
       post = $.post "measures/cql_to_elm", { cql: cql, authenticity_token: $("meta[name='csrf-token']").attr('content') }
       post.done (response) => @updateElm(response)
-      post.fail (response) => @displayErrors(response.responseJSON)
+      post.fail (response) => @displayErrors(response)
 
   updateElm: (elm) ->
     patientSource = new PatientSource(@collection)
@@ -102,8 +104,12 @@ class Thorax.Views.CqlTestView extends Thorax.Views.BonnieView
     @resultCollection.each (patient) => patient.set(results: results.patientResults[patient.id])
 
   displayErrors: (response) ->
-    errors = response.library.annotation.map (annotation) -> "Line #{annotation.startLine}: #{annotation.message}"
-    alert "Errors:\n\n#{errors.join("\n\n")}"
+    switch response.status
+      when 500
+        alert "CQL translation error: #{response.statusText}"
+      when 400
+        errors = response.responseJSON.library.annotation.map (annotation) -> "Line #{annotation.startLine}: #{annotation.message}"
+        alert "Errors:\n\n#{errors.join("\n\n")}"
 
   valueSetsForCodeService: ->
     valueSetsForCodeService = {}
@@ -119,27 +125,54 @@ class Thorax.Views.CqlTestView extends Thorax.Views.BonnieView
     [
       "library TinyQDM version '4'"
       "using QDM"
+      ""
       """valueset "Ischemic Stroke": '2.16.840.1.113883.3.117.1.7.1.247'"""
+      """valueset "Inpatient Encounter": '2.16.840.1.113883.3.464.1003.101.12.1060'"""
+      """valueset "Antithrombotic Therapy": '2.16.840.1.113883.3.117.1.7.1.201'"""
+      """valueset "Left Against Medical Advice": '2.16.840.1.113883.3.3157.1002.22'"""
+      ""
       "parameter MeasurementPeriod default Interval[DateTime(2012, 1, 1, 0, 0, 0, 0), DateTime(2013, 1, 1, 0, 0, 0, 0))"
       "context Patient"
       ""
-      "define PatientAge: AgeInYearsAt(start of MeasurementPeriod)"
+      "define OverEighteen: AgeInYearsAt(start of MeasurementPeriod) >= 18"
       ""
-      "define PatientOver18: AgeInYearsAt(start of MeasurementPeriod) > 18"
+      "// Inpatient encounters during the Measurement Period"
+      "define Encounters:"
+      """  ["Encounter, Performed": "Inpatient Encounter"] E where E."admission datetime" during MeasurementPeriod"""
       ""
-      """define IschemicStroke: ["Diagnosis, Active": "Ischemic Stroke"]"""
+      """define IschemicStroke: ["Diagnosis": "Ischemic Stroke"]"""
       ""
-      """define IschemicStrokeMP: IschemicStroke IS where IS."start datetime" during MeasurementPeriod"""
+      "// Inpatient encounters where an ischemic stroke was diagnosed"
+      "define EncountersWithIschemicStroke:"
+      """  Encounters E with IschemicStroke D such that Interval[E."admission datetime", E."discharge datetime"] includes D."onset datetime\""""
+      ""
+      "define Denominator: OverEighteen and Count(EncountersWithIschemicStroke) > 0"
+      ""
+      "// Discharged on antithrombotic therapy during an encounter with a stroke diagnosis"
+      "define MedicationDuringEncounter:"
+      """  ["Medication, Discharge": "Antithrombotic Therapy"] M with EncountersWithIschemicStroke E"""
+      """  such that Interval[E."admission datetime", E."discharge datetime"] includes M."start datetime\""""
+      ""
+      "define Numerator: Count(MedicationDuringEncounter) > 0"
+      ""
+      "// Encounters where the patient left against medical advice"
+      "define EncountersWherePatientLeft:"
+      """EncountersWithIschemicStroke E where E."discharge status" in "Left Against Medical Advice\""""
+      ""
+      "define DenominatorExclusions: Count(EncountersWherePatientLeft) > 0"
     ]
 
   addSnippet1: ->
-    @$('textarea').val(@snippets().slice(0, 7).join("\n"))
+    @$('textarea').val(@snippets().slice(0, 13).join("\n"))
 
   addSnippet2: ->
-    @$('textarea').val(@snippets().slice(0, 9).join("\n"))
+    @$('textarea').val(@snippets().slice(0, 17).join("\n"))
 
   addSnippet3: ->
-    @$('textarea').val(@snippets().slice(0, 11).join("\n"))
+    @$('textarea').val(@snippets().slice(0, 25).join("\n"))
 
   addSnippet4: ->
-    @$('textarea').val(@snippets().slice(0, 13).join("\n"))
+    @$('textarea').val(@snippets().slice(0, 32).join("\n"))
+
+  addSnippet5: ->
+    @$('textarea').val(@snippets().join("\n"))

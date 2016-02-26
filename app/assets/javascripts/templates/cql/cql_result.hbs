@@ -2,6 +2,14 @@
   {{result}}
 {{/ifCond}}
 
+{{#ifCond type "==" "boolean"}}
+  {{#if result}}
+    <i class="fa fa-check status status-pass" aria-hidden="true"></i>
+  {{else}}
+    <i class="fa fa-times status status-fail" aria-hidden="true"></i>
+  {{/if}}
+{{/ifCond}}
+
 {{#ifCond type "==" "array"}}
   {{#each result}}
     {{view "CQLResultView" result=this}}
