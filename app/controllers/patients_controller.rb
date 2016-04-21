@@ -34,32 +34,99 @@ class PatientsController < ApplicationController
       results << {}
       results[-1]['label'] = "#{patient.first} #{patient.last}"
       results[-1]['times'] = []
-      change = {}
-      change['result'] = 'pass' # or 'fail'
-      # for updateTime, we use the ObjectId generation time (because created_at is nil)
-      change['updateTime'] = (patient._id.generation_time.tv_sec * 1000)
-      change['changed'] = 'Initial Patient Creation'
-      results[-1]['times'] << change
+      
+      
+      curr_actual = nil
+      curr_expected = nil
+      
+      # if there are no history_tracks then we need to create an item. or if the first track doesnt have the same time creation as the patient
+      if patient.history_tracks.count == 0 || patient._id.generation_time.tv_sec != patient.history_tracks.first.updated_at.tv_sec
+        change = {}
+        
+        calc_results = nil
+        if patient.history_tracks.count > 0
+          calc_results = history_process_calc_values(patient.history_tracks.first.original['actual_values'], patient.history_tracks.first.original['expected_values'])
+        else
+          calc_results = history_process_calc_values(patient.actual_values, patient.expected_values)
+        end
+        change['result'] = calc_results[:result]
+        change['results'] = calc_results[:results]
+        change['values'] = calc_results[:values]
+        # for updateTime, we use the ObjectId generation time (because created_at is nil)
+        change['updateTime'] = (patient._id.generation_time.tv_sec * 1000)
+        change['changed'] = 'Initial Patient Creation'
+        
+        results[-1]['times'] << change
+      end
       
       # LOOP for each version of the patient
       patient.history_tracks.each do |track|
-        next if track.original.empty? #skip if this is the creation one
+        
+        curr_actual = track.tracked_changes['actual_values']['to'] if track.tracked_changes['actual_values']
+        curr_expected = track.tracked_changes['expected_values']['to'] if track.tracked_changes['expected_values']
         
         change = {}
-        change['result'] = 'pass' # or 'fail'
+        calc_results = history_process_calc_values(curr_actual, curr_expected)
+        
+        change['result'] = calc_results[:result]
+        change['results'] = calc_results[:results]
+        change['values'] = calc_results[:values]
+        
         change['updateTime'] = (track.updated_at.tv_sec * 1000)
-        description = ''
-        track.tracked_changes.each do |key,value|
-          description += "Changes in #{key.gsub('_',' ')}: "
-          description += history_changes(value['from'],value['to'])
-          description += "<br/>"
+        
+        if track.original.empty? #skip desc creation if this is the first one
+          change['changed'] = 'Initial Patient Creation'
+        else
+          description = ''
+          track.tracked_changes.each do |key,value|
+            description += "Changes in #{key.gsub('_',' ')}: "
+            description += history_changes(value['from'],value['to'])
+            description += "<br/>"
+          end
+          change['changed'] = description
         end
-        change['changed'] = description
+        
         results[-1]['times'] << change
       end
       # end LOOP    
     end
    render :json => results
+  end
+  
+  def history_process_calc_values(actual, expected)
+    results = { result: "pass", results: [], values: [] }
+    
+    # TODO: if we dont have actual values, assume actual matches expected
+    actual = expected unless actual
+    
+    return results if !expected
+    
+    # iterate through each stratification in actual results
+    actual.each_with_index do |strat_actual, strat_index|
+      strat_expected = expected[strat_index]
+      
+      strat_result = "pass"
+      strat_values = {}
+      
+      # extract and compare each value
+      HQMF::Measure::LogicExtractor::POPULATION_MAP.each_pair do |pop_code, pop_name|
+        actual_value = strat_actual.fetch(pop_code, nil)
+        expected_value = strat_expected.fetch(pop_code, 0)
+        
+        next if !actual_value
+        
+        strat_values[pop_code] = { expected: expected_value, actual: actual_value}
+        
+        if actual_value != expected_value
+          strat_result = "fail"
+          results[:result] = "fail"
+        end
+      end
+      
+      results[:results] << strat_result
+      results[:values] << strat_values
+    end
+    return results
   end
 
   def history_changes(from,to)
