@@ -19,7 +19,9 @@
     "css-toggle-switch": "~2.1.5",
     "bootstrap-file-input": "*",
     "MutationObserver-shim": "~0.2.8",
-    "handsontable": "~0.20.3"
+    "handsontable": "~0.20.3",
+    "datatables.net": "^1.10.11",
+    "datatables.net-bs": "^1.10.11"
   },
   "resolutions": {
     "bootstrap": "~3.3.0"
