@@ -62,13 +62,23 @@ class Thorax.Views.MeasurePopulationPatientDashboard extends Thorax.Views.Bonnie
       @widths = @getColWidths()
       @head1 = patientData.slice(0,1)[0]
       @head2 = patientData.slice(1,2)[0]
+      @sidehead2 = @head2.slice(0, 5)
       @data = patientData.slice(2)
+      @sideData = []
+      for item in @data
+        row = []
+        for cell, index in item
+          if index < 5
+            row.push(cell)
+        @sideData.push(row)
 
   context: ->
     _(super).extend
       patients: @data
       head1: @head1
       head2: @head2
+      sidehead2: @sidehead2
+      sidepatients: @sideData
       widths: @widths
 
   events:
@@ -89,11 +99,27 @@ class Thorax.Views.MeasurePopulationPatientDashboard extends Thorax.Views.Bonnie
         totalWidth += width
         
       # $('#patientDashboardTable').css("width", totalWidth)
-      table = $('#patientDashboardTable').DataTable( {
+      @table = $('#patientDashboardTable').DataTable( {
         autoWidth: false,
         columns: @getColWidths2(),
         scrollX: true,
-        fixedColumns: { leftColumns: 5 },
+        scrollY: "400px",
+        paging: false,
+        headerCallback: (thead, data, start, end, display) =>
+          row = thead # TODO: will this change if we have multiple rows in the header?
+          $(row).children().each (colIndex, element) =>
+            if @pd.isIndexInCollection(colIndex, 'expected') || @pd.isIndexInCollection(colIndex, 'actual')
+              $(element).addClass('rotate')
+        # columnDefs: [
+        #   {targets: [0,1], width:"90px"}
+        # ]
+        })
+      @table2 = $('#sideTable').DataTable( {
+        autoWidth: false,
+        columns: @getColWidths2().splice(0,5),
+        scrollX: true,
+        scrollY: "400px",
+        paging: false,
         headerCallback: (thead, data, start, end, display) =>
           row = thead # TODO: will this change if we have multiple rows in the header?
           $(row).children().each (colIndex, element) =>
@@ -105,6 +131,12 @@ class Thorax.Views.MeasurePopulationPatientDashboard extends Thorax.Views.Bonnie
         })
       blah = "blah"
       #@createTable()
+
+  changeData: (e) ->
+    cell = @table.cell(2, 15)
+    cell.data("LIZZIE")
+    @table.draw()
+    blah = "blah"
 
   getPatientData: ->
     @patientResults = @results.toJSON()

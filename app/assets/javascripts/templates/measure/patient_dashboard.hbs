@@ -1,4 +1,30 @@
-<table id="patientDashboardTable" class="cell-border" cellspacing="0" width="100%">
+<button class="btn btn-xs btn-primary" data-call-method="changeData">
+  TEST
+</button>
+
+<div class="inline">
+<table id="sideTable" class="cell-border">
+  <thead>
+    <tr>
+      {{#each sidehead2}}
+      <th><div class="tableScrollContainer"><div class="tableScroll">{{{this}}}</div></div></th>
+      {{/each}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#each sidepatients}}
+    <tr>
+      {{#each this}}
+      <td><div>{{{this}}}</div></td>
+      {{/each}}
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+</div>
+
+<div class="inline">
+<table id="patientDashboardTable" class="cell-border" cellspacing="0">
   <thead>
     <!--tr>
       {{#each head1}}
@@ -21,3 +47,4 @@
     {{/each}}
   </tbody>
 </table>
+</div>
