@@ -41,3 +41,6 @@ Handlebars.registerHelper 'ifCond', (v1, operator, v2, options) ->
     when '||'
       if (v1 || v2) then options.fn(this) else options.inverse(this)
     else return options.inverse(this)
+
+Handlebars.registerHelper 'lookup', (obj, field) ->
+  obj && obj[field]
