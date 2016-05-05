@@ -1,3 +1,12 @@
+class Thorax.Models.PatientDashboardPatient extends Thorax.Model
+  initialize: (patient)->
+    @set('birthdate', moment.utc(patient.get('birthdate'), 'X').format('L'))
+    @set('deathdate', moment.utc(patient.get('deathdate'), 'X').format('L'))
+    @set('first', patient.get('first'))
+    @set('last', patient.get('last'))
+    @set('notes', patient.get('notes'))
+    @set('gender', patinet.get('gender'))
+    
 class Thorax.Models.PatientDashboard extends Thorax.Model
   @ACTIONS = "actions"
   @OPEN = "open"
