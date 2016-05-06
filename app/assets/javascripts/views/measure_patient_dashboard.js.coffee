@@ -53,6 +53,12 @@ class Thorax.Views.MeasurePopulationPatientDashboard extends Thorax.Views.Bonnie
 
     @editableCols = @getEditableCols() # these are the fields that should be inline editable
     
+    patientDashboardPatients = new Thorax.Collections.PatientDashboardPatients()
+    @measure.get('patients').each (patient) ->
+      patientDashboardPatient = new Thorax.Models.PatientDashboardPatient(patient)
+      patientDashboardPatients.add(patientDashboardPatient)
+    @patientDashboardPatientsView = new Thorax.Views.PatientDashboardPatients collection:patientDashboardPatients
+    
     @results = @population.calculationResults()
     @results.calculationsComplete =>
       @patientResults = @results.toJSON()

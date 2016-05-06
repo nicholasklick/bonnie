@@ -5,8 +5,11 @@ class Thorax.Models.PatientDashboardPatient extends Thorax.Model
     @set('first', patient.get('first'))
     @set('last', patient.get('last'))
     @set('notes', patient.get('notes'))
-    @set('gender', patinet.get('gender'))
-    
+    @set('gender', patient.get('gender'))
+
+class Thorax.Collections.PatientDashboardPatients extends Thorax.Collection
+  model: Thorax.Models.PatientDashboardPatient
+
 class Thorax.Models.PatientDashboard extends Thorax.Model
   @ACTIONS = "actions"
   @OPEN = "open"

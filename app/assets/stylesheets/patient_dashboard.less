@@ -17,16 +17,34 @@ html, body, .container-fluid, [role="main"], .measure-layout, .patient-dashboard
 
 div.inline {
   display: inline-block;
+}
+
+div.content {
+  height: 300px;
+  overflow: auto;
   width: 500px;
 }
 
-table.dataTable {
+div.content2 {
+  height: 300px;
+  overflow: auto;
+  width: 500px;
+}
+
+div.fixed-col {
+  height: 300px;
+  overflow: auto;
+  width: 500px;
+}
+
+table.dataTable, table.lizzieTable {
   z-index: 10;
   table-layout: fixed;
 
   td {
     // border-right: inherit;
-    border-bottom: inherit;
+    border-bottom-style:solid;
+    border-bottom-width: medium;
   }
   
   // thead th,
