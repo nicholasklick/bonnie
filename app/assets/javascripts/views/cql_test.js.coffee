@@ -40,7 +40,8 @@ class WrappedPatient
 
 class PatientSource
   constructor: (@patients) -> @index = 0
-  currentPatient: -> new WrappedPatient(@patients.at(@index)) if @patients.at(@index)
+  currentPatient: -> new CQL_QDM.CQLPatient(@patients.at(@index)) if @patients.at(@index)
+  #currentPatient: -> new WrappedPatient(@patients.at(@index)) if @patients.at(@index)
   nextPatient: -> @index += 1
 
 
