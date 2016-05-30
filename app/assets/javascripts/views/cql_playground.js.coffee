@@ -17,7 +17,9 @@ class Thorax.Views.CqlPlaygroundView extends Thorax.Views.BonnieView
     "ready": ->
       @$('#cqlTestDialog').modal(backdrop: 'static', show: true)
       @editor = ace.edit("editor")
-      @editor.setTheme("ace/theme/twilight")
+      @editor.setTheme("ace/theme/xcode")
+      @editor.setShowPrintMargin(false)
+      @editor.setValue(@exampleCql(), -1)
     "submit form": (event) ->
       event.preventDefault()
       cql = @$('textarea').val()
@@ -47,3 +49,6 @@ class Thorax.Views.CqlPlaygroundView extends Thorax.Views.BonnieView
       for concept in vs.concepts
         valueSetsForCodeService[oid][vs.version].push code: concept.code, system: concept.code_system_name, version: vs.version
     valueSetsForCodeService
+
+  exampleCql: ->
+    'library AsthmaMeasure version "1"\nusing QDM\n\nvalueset "Persistent Asthma": "2.16.840.1.113883.3.464.1003.102.12.1023"\nvalueset "Encounter Inpatient": "2.16.840.1.113883.13.190.5.6"\nvalueset "Preferred Asthma Therapy": "2.16.840.1.113883.3.464.1003.196.12.1212"\n\nparameter MeasurementPeriod default Interval[DateTime(2012, 1, 1, 0, 0, 0, 0), DateTime(2013, 1, 1, 0, 0, 0, 0))\n\ncontext Patient\n\ndefine "$Encounters":\n\t["Encounter, Performed": "Encounter Inpatient"] E\n\t\twhere E."admissionDatetime" during MeasurementPeriod\n'

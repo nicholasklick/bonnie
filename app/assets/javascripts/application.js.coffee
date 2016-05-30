@@ -32,7 +32,7 @@
 #= require MutationObserver-shim/dist/mutationobserver.min
 #= require cql_qdm_patientapi
 #= require ace-builds/src-min-noconflict/ace.js
-#= require ace-builds/src-min-noconflict/theme-twilight.js
+#= require ace-builds/src-min-noconflict/theme-xcode.js
 #
 #= require helpers
 #= require_tree ./templates
