@@ -15,10 +15,12 @@ class Thorax.Views.CqlPlaygroundView extends Thorax.Views.BonnieView
 
   events:
     "ready": ->
-      @$('#cqlTestDialog').modal(backdrop: 'static', show: true)
+      @$('#cqlPlayground').modal(backdrop: 'static', show: true)
       @editor = ace.edit("editor")
       @editor.setTheme("ace/theme/chrome")
       @editor.setShowPrintMargin(false)
+      $("#cqlPlayground").on 'hide.bs.modal', ->
+        $('#editor').remove()
 
   evaluateCql: ->
     cql = @editor.getValue()
@@ -60,6 +62,5 @@ class Thorax.Views.CqlResultsView extends Thorax.Views.BonnieView
 
   context: ->
     # We use the list of patients for the header
-    debugger
     patients = @collection.models
     _(super).extend patients: patients
