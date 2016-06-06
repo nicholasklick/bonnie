@@ -43,4 +43,29 @@ class Record
     end
   end
 
+  def qrda_expected_values(measure)
+    evs = []
+    measure.first.populations.each_with_index do |pop, idx|
+      pop.each do |pkey, pvalue|
+        if pkey == 'id' || pkey == 'title' || pkey.downcase.match(/^strat/) || pkey == 'OBSERV'
+          next
+        end
+        this_ev = { code: nil, display_name: nil, hqmf_id: nil, expected_value: nil }
+        this_ev[:hqmf_id] = measure.first.population_criteria[pvalue.to_s]['hqmf_id']
+        if pkey == 'DENEX'
+          this_ev[:display_name] = 'Denominator Exclusions'
+        else
+          this_ev[:display_name] = measure.first.population_criteria[pvalue.to_s]['title']
+        end
+        this_ev[:code] = pkey == 'IPP' ? 'IPOP' : pkey
+        # Going to assume that any expected_value > 0 is a TRUE
+        # As per HL7 CDA R2:QRDA I, R1, STU Release 3.1, US Realm, Vol. 2 —Templates and Supporting Material
+        # Set negationInd="false" to assert true (that the criteria are met by the included data). Set negationInd="true" to assert false (that the criteria are not met by the included data).
+        this_ev[:expected_value] = expected_values[idx][pkey].to_s == '0' ? 'true' : 'false'
+        evs << this_ev
+      end
+    end
+    evs # return
+  end
+
 end

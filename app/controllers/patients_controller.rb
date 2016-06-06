@@ -69,6 +69,7 @@ class PatientsController < ApplicationController
         patient_measure = measure || get_associated_measure(patient)
         # attach the QRDA export, or the error
         begin
+          patient['qrda_expected_values'] = patient.qrda_expected_values(patient_measure)
           qrda = qrda_patient_export(patient, patient_measure) # allow error to stop execution before header is written
           zip.put_next_entry(File.join("qrda","#{index+1}_#{patient.last}_#{patient.first}.xml"))
           zip.puts qrda
